@@ -1,44 +1,47 @@
-from enum import Enum
-from events import OrderCreated, StatusChanged
 
 
-class OrderStatus(Enum):
+class Wallet:
 
-    NEW = 'new'
-    PAID = 'paid'
-    CONFIRMED = 'confirmed'
-    SHIPPED = 'shipped'
-
-
-class Order:
-
-    def __init__(self, user_id: int, status: str = 'new'):
+    def __init__(self, user_id: int, balance: float):
         self.user_id = user_id
-        self.status = status
+        self.balance = balance
+
         self.events = ['new']
-        self.changed = []
 
-    def set_status(self, new_status: str):
-        if new_status.upper() not in OrderStatus.__members__:
-            return ValueError('Invalid status - {}'.format(new_status))
+    def create(self):
+        ...
 
-        self.status = new_status
-        self.events.append(new_status)
+    def deposit(self, amount: float):
+        if amount < 0:
+            return ValueError('amount must be positive')
 
-        event = StatusChanged(new_status)
-        self.changed.append(event)
+        self.balance += amount
+        self.events.append('deposit')
 
-    def get_status(self):
-        return self.status
+    def withdraw(self, amount: float):
+        if amount > self.balance:
+            return ValueError('amount can not be greater than balance')
+        self.balance -= amount
+        self.events.append('withdraw')
 
-    def get_events(self):
-        return [str(change) for change in self.changed]
+    def get_balance(self):
+        return self.balance
+
+    def get_history(self) -> list:
+        return self.events
 
 
-order = Order(user_id=1) # 1
-order.set_status('confirmed')  # 2
-order.set_status('paid')  # 3
-order.set_status('shipped')  # 4
+wallet = Wallet(user_id=1, balance=0)
 
-print(order.get_status())
-print(order.get_events())
+print(wallet.get_balance())
+
+wallet.deposit(1000)
+wallet.deposit(5000)
+wallet.withdraw(3250)
+wallet.deposit(1563)
+wallet.withdraw(4100)
+
+print(wallet.get_balance())
+
+print(wallet.get_history())
+
