@@ -5,6 +5,10 @@ from es_app.models import Wallet, Event
 
 
 class EventService:
+    """
+    The behavior of this class is like a repository pattern.
+    encapsulate db from logic and other alyer.
+    """
     @classmethod
     def create_event(cls, wallet_id: int, event, status, balance):
         Event.objects.create(wallet_id=wallet_id,
